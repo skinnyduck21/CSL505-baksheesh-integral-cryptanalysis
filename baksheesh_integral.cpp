@@ -1,27 +1,27 @@
 /**
  * BAKSHEESH Cipher – 3-Round Integral Distinguisher Verification
  *
- * Implements the integral cryptanalysis from ic_on_bak_2.pdf:
- *   - Build a set of 16 chosen plaintexts where nibble w_0 is ACTIVE
- *     (takes all 16 values 0x0..0xF) and every other nibble is CONSTANT.
- *   - Encrypt each plaintext through 3 rounds of BAKSHEESH.
- *   - Verify that the XOR sum of every output nibble across the 16
- *     ciphertexts is 0 (i.e., all nibbles are BALANCED).
+ * Implements the 3-round integral cryptanalysis:
+ * - Build a set of 16 chosen plaintexts where nibble w_0 is ACTIVE
+ * (takes all 16 values 0x0..0xF) and every other nibble is CONSTANT.
+ * - Encrypt each plaintext through 3 rounds of BAKSHEESH.
+ * - Verify that the XOR sum of every output nibble across the 16
+ * ciphertexts is 0 (i.e., all nibbles are BALANCED).
  *
- * Cipher specification (baksheesh_cipher.pdf / 2023-750.pdf):
- *   State     : 128 bits = 32 nibbles (w_0 … w_31), b_0 is LSB.
- *   SBox      : S = 306DB58ECF924A71
- *   PermBits  : P128 from GIFT-128
- *   AddConst  : 6-bit RC at tap positions {8,13,19,35,67,106}
- *   AddRndKey : Full 128-bit XOR; k^{j+1} = k^j rotated right 1 bit
- *   Encryption: state ^= k^0 , then for r=1..N: SubCells, PermBits,
- *               AddConstants(r), state ^= k^r
+ * Cipher specification:
+ * State     : 128 bits = 32 nibbles (w_0 … w_31), b_0 is LSB.
+ * SBox      : S = 306DB58ECF924A71
+ * PermBits  : P128 from GIFT-128
+ * AddConst  : 6-bit RC at tap positions {8,13,19,35,67,106}
+ * AddRndKey : Full 128-bit XOR; k^{j+1} = k^j rotated right 1 bit
+ * Encryption: state ^= k^0 , then for r=1..N: SubCells, PermBits,
+ * AddConstants(r), state ^= k^r
  *
  * Byte storage convention:
- *   state[0]  = most-significant byte  (bits 127..120)
- *   state[15] = least-significant byte (bits   7..  0)
- *   Nibble w_i occupies bits 4i+3..4i:
- *     byte index = 15 - i/2  ,  lower nibble if i even, upper if i odd.
+ * state[0]  = most-significant byte  (bits 127..120)
+ * state[15] = least-significant byte (bits   7..  0)
+ * Nibble w_i occupies bits 4i+3..4i:
+ * byte index = 15 - i/2  ,  lower nibble if i even, upper if i odd.
  */
 
 #include <iostream>
